@@ -17,14 +17,9 @@ const GET_CART_HIDDEN = gql`
   }
 `;
 
-const GET_CART_ITEMS = gql`
+const GET_CART_DATA = gql`
   {
     cartItems @client
-  }
-`;
-
-const GET_CART_TOTAL = gql`
-  {
     cartTotal @client
   }
 `;
@@ -51,7 +46,7 @@ export const resolvers = {
     },
     addItemToCart: (_root, { item }, { cache }) => {
       const { cartItems } = cache.readQuery({
-        query: GET_CART_ITEMS,
+        query: GET_CART_DATA,
       });
 
       const newCartItems = addItemToCart(cartItems, item);
@@ -62,13 +57,11 @@ export const resolvers = {
       });
 
       cache.writeQuery({
-        query: GET_CART_TOTAL,
-        data: { cartTotal: getCartTotal(newCartItems) },
-      });
-
-      cache.writeQuery({
-        query: GET_CART_ITEMS,
-        data: { cartItems: newCartItems },
+        query: GET_CART_DATA,
+        data: {
+          cartItems: newCartItems,
+          cartTotal: getCartTotal(newCartItems),
+        },
       });
 
       return newCartItems;

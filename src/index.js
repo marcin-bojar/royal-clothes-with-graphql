@@ -13,7 +13,7 @@ import { store, persistor } from './redux/store';
 import { typeDefs, resolvers } from './graphql/resolvers';
 
 import './index.css';
-import App from './App';
+import { default as App } from './App.container';
 
 const httpLink = createHttpLink({
   uri: 'https://crwn-clothing.com',
@@ -34,6 +34,7 @@ client.writeData({
     cartItems: [],
     itemsCount: 0,
     cartTotal: 0,
+    currentUser: null,
   },
 });
 

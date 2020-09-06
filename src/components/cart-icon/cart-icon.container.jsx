@@ -10,12 +10,6 @@ const TOGGLE_CART_HIDDEN = gql`
   }
 `;
 
-const GET_CART_ITEMS = gql`
-  {
-    cartItems @client
-  }
-`;
-
 const GET_ITEMS_COUNT = gql`
   {
     itemsCount @client

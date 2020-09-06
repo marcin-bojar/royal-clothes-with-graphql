@@ -1,5 +1,10 @@
 import { gql } from 'apollo-boost';
-import { addItemToCart, getCartItemsCount, getCartTotal } from './cart.utils';
+import {
+  addItemToCart,
+  removeItemFromCart,
+  getCartItemsCount,
+  getCartTotal,
+} from './cart.utils';
 
 export const typeDefs = gql`
   extend type Item {
@@ -8,6 +13,8 @@ export const typeDefs = gql`
   extend type Mutation {
     ToggleCartHidden: Boolean!
     AddItemToCart(item: Item!): [Item]!
+    RemoveItemFromCart(item: Item!): [Item]!
+    ClearItemFromCart(item: Item!): [Item]!
   }
 `;
 
@@ -50,6 +57,52 @@ export const resolvers = {
       });
 
       const newCartItems = addItemToCart(cartItems, item);
+
+      cache.writeQuery({
+        query: GET_ITEMS_COUNT,
+        data: { itemsCount: getCartItemsCount(newCartItems) },
+      });
+
+      cache.writeQuery({
+        query: GET_CART_DATA,
+        data: {
+          cartItems: newCartItems,
+          cartTotal: getCartTotal(newCartItems),
+        },
+      });
+
+      return newCartItems;
+    },
+
+    removeItemFromCart: (_root, { item }, { cache }) => {
+      const { cartItems } = cache.readQuery({
+        query: GET_CART_DATA,
+      });
+
+      const newCartItems = removeItemFromCart(cartItems, item);
+
+      cache.writeQuery({
+        query: GET_ITEMS_COUNT,
+        data: { itemsCount: getCartItemsCount(newCartItems) },
+      });
+
+      cache.writeQuery({
+        query: GET_CART_DATA,
+        data: {
+          cartItems: newCartItems,
+          cartTotal: getCartTotal(newCartItems),
+        },
+      });
+
+      return newCartItems;
+    },
+
+    clearItemFromCart: (_root, { item }, { cache }) => {
+      const { cartItems } = cache.readQuery({
+        query: GET_CART_DATA,
+      });
+
+      const newCartItems = cartItems.filter(el => el.id !== item.id);
 
       cache.writeQuery({
         query: GET_ITEMS_COUNT,
